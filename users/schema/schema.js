@@ -1,10 +1,10 @@
-const { urlencoded } = require('express');
 const graphql = require('graphql');
 
 const {
   GraphQLObjectType,
   GraphQLString,
-  GraphQLInt
+  GraphQLInt,
+  GraphQLSchema
 } = graphql;
 
 const users = [
@@ -12,7 +12,7 @@ const users = [
   { id: '2', firstName: 'Jane', age: 35 }
 ];
 
-const userType = new GraphQLObjectType({
+const UserType = new GraphQLObjectType({
   name: 'User',
   fields: {
     id: { type: GraphQLString },
@@ -21,13 +21,19 @@ const userType = new GraphQLObjectType({
   }
 });
 
-const rootQuery = new GraphQLObjectType({
+const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: {
-    user: { type: userType },
-    args: { id: { type: GraphQLString } },
-    resolve(parentValue, args) {
-      return users.find(user => user.id === args.id);
-    }
+    user: {
+      type: UserType,
+      args: { id: { type: GraphQLString } },
+      resolve(parentValue, args) {
+        return users.find(user => user.id === args.id);
+      }
+    },
   }
+});
+
+module.exports = new GraphQLSchema({
+  query: RootQuery
 });
